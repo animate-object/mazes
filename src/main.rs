@@ -1,13 +1,15 @@
-pub mod maze;
-use maze::*;
+mod maze;
+use maze::alg::*;
+use maze::grid::*;
 
 fn main() {
-    let mut maze_gen = MazeGen::with_side_len(5).unwrap();
-    println!("{:?}", maze_gen);
-    println!("{:?}", maze_gen.carve(0, &Direction::South));
-    println!("{:?}", maze_gen.carve(5, &Direction::South));
-    println!("{:?}", maze_gen.carve(10, &Direction::South));
-    println!("{:?}", maze_gen.carve(15, &Direction::South));
-    println!("{:?}", maze_gen.carve(20, &Direction::South));
-    println!("{:?}", maze_gen);
+    let dim = Dimensions {
+        width: 10,
+        height: 10,
+    };
+    let mut grid = Grid::with_dim(dim).unwrap();
+
+    bin_tree::apply(&mut grid).err().map(|e| println!("{}", e));
+
+    println!("{}", grid.to_ascii());
 }
