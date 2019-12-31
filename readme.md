@@ -17,10 +17,18 @@ Why Rust?
 
 ## Milestone 0: Maze generation module sophisticated enough to support basic maze generation algorithms
 
--
+- is open check [done]
+- ability to print mazes for debugging [done]
 
 ## Milestone 1: Sidewinder and Binary Tree algorithm
 
+- implement binary tree algorithm [done]
+- support efficient way to iterate over cells in different orders (e.g. NE -> SW)
+- generalize binary tree algorithm to take direction paramaters
+- implement sidewinder algorithm
+
 ## Milestone 2: Unbiased algorithms (Wilson's)
 
-- As necessary, augment maze generation code to support coloring
+- Implement Wilson's algorithm
+- Implement Aldous-Broder algorithm
+- Experiment w/Wilsons's-AB hybrid

@@ -29,6 +29,7 @@ impl Grid {
     }
   }
 
+  #[allow(dead_code)]
   pub fn square(len: usize) -> Result<Grid, &'static str> {
     let dim = Dimensions {
       width: len,
@@ -41,7 +42,6 @@ impl Grid {
     self.dim.width
   }
 
-  #[allow(dead_code)]
   pub fn height(&self) -> usize {
     self.dim.height
   }
@@ -92,7 +92,6 @@ impl Grid {
     }
   }
 
-  #[allow(dead_code)]
   pub fn look(&self, cursor: usize, dir: &Direction) -> Option<&u8> {
     self
       .find_valid_neighbor_idx(cursor, dir)
