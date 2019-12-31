@@ -14,7 +14,43 @@ pub struct Grid {
   dim: Dimensions,
 }
 
-type CarveResult = Result<&'static str, &'static str>;
+pub struct CarveError {
+  code: u8,
+}
+
+impl CarveError {
+  pub fn msg(&self) -> &'static str {
+    match self.code {
+      0 => "Cursor not found.",
+      1 => "Hit maze boundary.",
+      2 => "Did not find neighbor where one was expected.",
+      8 => "Unexpected error",
+      _ => "Unspecified error code",
+    }
+  }
+
+  pub fn with_code(code: u8) -> CarveError {
+    CarveError { code: code }
+  }
+
+  pub fn cursor_not_found() -> CarveError {
+    CarveError::with_code(0)
+  }
+
+  pub fn hit_boundary() -> CarveError {
+    CarveError::with_code(1)
+  }
+
+  pub fn missing_neighbor() -> CarveError {
+    CarveError::with_code(2)
+  }
+
+  pub fn unexpected_error() -> CarveError {
+    CarveError::with_code(8)
+  }
+}
+
+type CarveResult = Result<&'static str, CarveError>;
 
 impl Grid {
   pub fn with_dim(dim: Dimensions) -> Result<Grid, &'static str> {
@@ -109,10 +145,12 @@ impl Grid {
             remove_wall(cell, neighbor, dir);
             Ok("Carved new passage")
           }
-          _ => Err("One of cell, neighbor, were not found"),
+          (Some(_), None) => Err(CarveError::missing_neighbor()),
+          (None, Some(_)) => Err(CarveError::cursor_not_found()),
+          _ => Err(CarveError::unexpected_error()),
         }
       }
-      None => Err("Invalid Neighbor"),
+      None => Err(CarveError::cursor_not_found()),
     }
   }
 

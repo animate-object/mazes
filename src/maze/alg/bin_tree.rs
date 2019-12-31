@@ -1,23 +1,28 @@
 use super::super::grid::*;
 use rand::*;
 
-pub fn apply(grid: &mut Grid) -> Result<&str, &str> {
-  let rng = rand::thread_rng();
+pub fn apply(grid: &mut Grid) -> Result<String, String> {
   for cursor in 0..grid.area() {
     let open_east = grid.look(cursor, &Direction::East).is_some();
     let open_south = grid.look(cursor, &Direction::South).is_some();
 
-    if open_south && open_east {
-      if random() {
-        grid.carve(cursor, &Direction::South).unwrap();
-      } else {
-        grid.carve(cursor, &Direction::East).unwrap();
+    let result = match (open_south, open_east) {
+      (true, true) => {
+        if random() {
+          grid.carve(cursor, &Direction::South)
+        } else {
+          grid.carve(cursor, &Direction::East)
+        }
       }
-    } else if open_east {
-      grid.carve(cursor, &Direction::East).unwrap();
-    } else if open_south {
-      grid.carve(cursor, &Direction::South).unwrap();
+      (true, false) => grid.carve(cursor, &Direction::South),
+      (false, true) => grid.carve(cursor, &Direction::East),
+      (false, false) => Ok("Found opposite corner"),
+    };
+
+    if result.is_err() {
+      let msg = "Unexpected error carving maze: ".to_string() + result.unwrap_err().msg();
+      return Err(msg);
     }
   }
-  Ok("Operation succeeded")
+  Ok("Operation succeeded".to_string())
 }
