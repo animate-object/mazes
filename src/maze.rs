@@ -16,12 +16,36 @@ pub struct MazeGen {
 
 #[derive(Debug)]
 pub enum Direction {
-  North,
-  South,
-  East,
-  West,
-  Up,
-  Down,
+  North = 0b00001000,
+  South = 0b00000100,
+  East = 0b00000010,
+  West = 0b00000001,
+  Up = 0b00010000,
+  Down = 0b00100000,
+}
+
+impl Direction {
+  fn value(&self) -> u8 {
+    match self {
+      Direction::North => 0b00001000,
+      Direction::South => 0b00000100,
+      Direction::East => 0b00000010,
+      Direction::West => 0b00000001,
+      Direction::Up => 0b00010000,
+      Direction::Down => 0b00100000,
+    }
+  }
+
+  fn inverse(&self) -> Direction {
+    match self {
+      Direction::North => Direction::South,
+      Direction::East => Direction::West,
+      Direction::South => Direction::North,
+      Direction::West => Direction::East,
+      Direction::Up => Direction::Down,
+      Direction::Down => Direction::Up,
+    }
+  }
 }
 
 impl MazeGen {
@@ -63,24 +87,37 @@ impl MazeGen {
   }
 
   fn find_valid_neighbor_idx<'cells>(&self, cursor: usize, dir: &Direction) -> Option<usize> {
-    let (idx, offgrid) = match dir {
+    match dir {
       Direction::North => {
-        let idx = cursor - self.width();
-        (idx, self.width() > cursor)
+        if self.width() >= cursor {
+          Some(cursor - self.width())
+        } else {
+          None
+        }
       }
       Direction::South => {
         let idx = cursor + self.width();
-        (idx, idx > self.area())
+        if idx <= self.area() {
+          Some(idx)
+        } else {
+          None
+        }
       }
-      Direction::East => (cursor + 1, cursor % self.width() == self.width() - 1),
-      Direction::West => (cursor - 1, cursor % self.width() == 0),
-      _ => (0, false),
-    };
-
-    if !offgrid {
-      Some(idx)
-    } else {
-      None
+      Direction::East => {
+        if self.width() < 1 || cursor % self.width() == self.width() - 1 {
+          None
+        } else {
+          Some(cursor + 1)
+        }
+      }
+      Direction::West => {
+        if cursor % self.width() != 0 {
+          Some(cursor - 1)
+        } else {
+          None
+        }
+      }
+      _ => None,
     }
   }
 
@@ -113,8 +150,11 @@ impl MazeGen {
   }
 }
 
+// Carve a passage in dir from cell to neighbor
+// nb. a northern passage from a to b implies a southern passage from b to a
 pub fn remove_wall(_cell: &mut u8, _neighbor: &mut u8, dir: &Direction) {
-  println!("Carving a {:?} wall ", dir);
+  *_cell = *_cell | dir.value();
+  *_neighbor = *_neighbor | dir.inverse().value();
 }
 
 fn get_distinct_mut<T>(
