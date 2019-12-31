@@ -14,44 +14,6 @@ pub struct Grid {
   dim: Dimensions,
 }
 
-pub struct CarveError {
-  code: u8,
-}
-
-impl CarveError {
-  pub fn msg(&self) -> &'static str {
-    match self.code {
-      0 => "Cursor not found.",
-      1 => "Hit maze boundary.",
-      2 => "Did not find neighbor where one was expected.",
-      8 => "Unexpected error",
-      _ => "Unspecified error code",
-    }
-  }
-
-  pub fn with_code(code: u8) -> CarveError {
-    CarveError { code: code }
-  }
-
-  pub fn cursor_not_found() -> CarveError {
-    CarveError::with_code(0)
-  }
-
-  pub fn hit_boundary() -> CarveError {
-    CarveError::with_code(1)
-  }
-
-  pub fn missing_neighbor() -> CarveError {
-    CarveError::with_code(2)
-  }
-
-  pub fn unexpected_error() -> CarveError {
-    CarveError::with_code(8)
-  }
-}
-
-type CarveResult = Result<&'static str, CarveError>;
-
 impl Grid {
   pub fn with_dim(dim: Dimensions) -> Result<Grid, &'static str> {
     let maybe_area = usize::try_from(dim.width * dim.height);
@@ -244,3 +206,43 @@ impl Direction {
     self.value() & cell > 0
   }
 }
+
+// Status ---------------------------------------------------------------------
+
+pub struct CarveError {
+  code: u8,
+}
+
+impl CarveError {
+  pub fn msg(&self) -> &'static str {
+    match self.code {
+      0 => "Cursor not found.",
+      1 => "Hit maze boundary.",
+      2 => "Did not find neighbor where one was expected.",
+      8 => "Unexpected error",
+      _ => "Unspecified error code",
+    }
+  }
+
+  pub fn with_code(code: u8) -> CarveError {
+    CarveError { code: code }
+  }
+
+  pub fn cursor_not_found() -> CarveError {
+    CarveError::with_code(0)
+  }
+
+  pub fn hit_boundary() -> CarveError {
+    CarveError::with_code(1)
+  }
+
+  pub fn missing_neighbor() -> CarveError {
+    CarveError::with_code(2)
+  }
+
+  pub fn unexpected_error() -> CarveError {
+    CarveError::with_code(8)
+  }
+}
+
+type CarveResult = Result<&'static str, CarveError>;
