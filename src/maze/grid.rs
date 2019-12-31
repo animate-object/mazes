@@ -150,7 +150,7 @@ impl Grid {
           _ => Err(CarveError::unexpected_error()),
         }
       }
-      None => Err(CarveError::cursor_not_found()),
+      None => Err(CarveError::hit_boundary()),
     }
   }
 
