@@ -2,7 +2,7 @@ use super::super::grid::*;
 use rand::*;
 
 pub fn apply(grid: &mut Grid) -> Result<String, String> {
-  for cursor in 0..grid.area() {
+  for cursor in grid.traverse(iter::TraversalOrder::RowWise, iter::Corner::NorthWest) {
     let open_east = grid.look(cursor, &Direction::East).is_some();
     let open_south = grid.look(cursor, &Direction::South).is_some();
 
@@ -16,7 +16,7 @@ pub fn apply(grid: &mut Grid) -> Result<String, String> {
       }
       (true, false) => grid.carve(cursor, &Direction::South),
       (false, true) => grid.carve(cursor, &Direction::East),
-      (false, false) => Ok("Found opposite corner"),
+      (false, false) => Ok("Reached opposite corner"),
     };
 
     if result.is_err() {

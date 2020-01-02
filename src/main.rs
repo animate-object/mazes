@@ -4,8 +4,8 @@ use maze::grid::*;
 
 fn main() {
     let dim = Dimensions {
-        width: 10,
-        height: 10,
+        width: 100,
+        height: 1000,
     };
     let mut grid = Grid::with_dim(dim).unwrap();
 

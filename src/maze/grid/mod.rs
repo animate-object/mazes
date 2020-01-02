@@ -1,5 +1,8 @@
+use super::super::iter::*;
 use ::rand::{self, Rng};
 use ::std::convert::TryFrom;
+
+pub mod iter;
 
 #[derive(Debug)]
 pub struct Dimensions {
@@ -140,6 +143,10 @@ impl Grid {
       builder.push_str(&souths);
     }
     builder
+  }
+
+  pub fn traverse(&self, traversal_order: TraversalOrder, start_corner: Corner) -> IterGrid {
+    return IterGrid::new(self.height(), self.width(), traversal_order, start_corner);
   }
 }
 
