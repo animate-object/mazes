@@ -1,8 +1,8 @@
 use super::super::grid::*;
 use rand::*;
 
-pub fn apply(grid: &mut Grid, corner: &Corner) -> Result<String, String> {
-  for cursor in grid.traverse(&TraversalOrder::ColumnWise, corner) {
+pub fn apply(grid: &mut Grid, corner: &'static Corner) -> Result<String, String> {
+  for cursor in grid.traverse(&TraversalOrder::RowWise, corner) {
     let (d1, d2) = corner.to_directions();
 
     let open_one = grid.look(cursor, &d1).is_some();

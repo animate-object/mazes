@@ -3,14 +3,14 @@ use maze::alg::*;
 use maze::grid::*;
 
 fn main() {
-    let corners = vec![
+    static CORNERS: [Corner; 4] = [
         Corner::NorthEast,
         Corner::NorthWest,
         Corner::SouthEast,
         Corner::SouthWest,
     ];
 
-    for c in corners.iter() {
+    for c in CORNERS.iter() {
         let dim = Dimensions {
             width: 10,
             height: 10,

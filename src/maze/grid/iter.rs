@@ -11,7 +11,7 @@ impl GridIter {
     height: usize,
     width: usize,
     traversal_order: &TraversalOrder,
-    start_corner: &Corner,
+    start_corner: &'static Corner,
   ) -> GridIter {
     let (row_wise, col_wise) = match traversal_order {
       TraversalOrder::RowWise => (1, 0),
@@ -27,7 +27,7 @@ impl GridIter {
     let row_fn = move |position: usize| {
       let row_idx = row_wise * (position / width) + col_wise * (position % height);
       if reverse_row {
-        return width - 1 - row_idx;
+        return height - 1 - row_idx;
       } else {
         return row_idx;
       }
@@ -36,7 +36,7 @@ impl GridIter {
     let col_fn = move |position: usize| {
       let col_idx = row_wise * (position % width) + col_wise * (position / height);
       if reverse_col {
-        return height - 1 - col_idx;
+        return width - 1 - col_idx;
       } else {
         return col_idx;
       }

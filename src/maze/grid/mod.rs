@@ -144,7 +144,11 @@ impl Grid {
     builder
   }
 
-  pub fn traverse(&self, traversal_order: &TraversalOrder, start_corner: &Corner) -> GridIter {
+  pub fn traverse(
+    &self,
+    traversal_order: &'static TraversalOrder,
+    start_corner: &'static Corner,
+  ) -> GridIter {
     return GridIter::new(self.height(), self.width(), traversal_order, start_corner);
   }
 }
