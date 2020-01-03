@@ -1,21 +1,23 @@
 use super::super::grid::*;
 use rand::*;
 
-pub fn apply(grid: &mut Grid) -> Result<String, String> {
-  for cursor in grid.traverse(iter::TraversalOrder::RowWise, iter::Corner::NorthWest) {
-    let open_east = grid.look(cursor, &Direction::East).is_some();
-    let open_south = grid.look(cursor, &Direction::South).is_some();
+pub fn apply(grid: &mut Grid, corner: &Corner) -> Result<String, String> {
+  for cursor in grid.traverse(&TraversalOrder::ColumnWise, corner) {
+    let (d1, d2) = corner.to_directions();
 
-    let result = match (open_south, open_east) {
+    let open_one = grid.look(cursor, &d1).is_some();
+    let open_two = grid.look(cursor, &d2).is_some();
+
+    let result = match (open_one, open_two) {
       (true, true) => {
         if random() {
-          grid.carve(cursor, &Direction::South)
+          grid.carve(cursor, &d1)
         } else {
-          grid.carve(cursor, &Direction::East)
+          grid.carve(cursor, &d2)
         }
       }
-      (true, false) => grid.carve(cursor, &Direction::South),
-      (false, true) => grid.carve(cursor, &Direction::East),
+      (true, false) => grid.carve(cursor, &d1),
+      (false, true) => grid.carve(cursor, &d2),
       (false, false) => Ok("Reached opposite corner"),
     };
 

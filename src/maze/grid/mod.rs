@@ -60,7 +60,6 @@ impl Grid {
   fn find_valid_neighbor_idx<'cells>(&self, cursor: usize, dir: &Direction) -> Option<usize> {
     match dir {
       Direction::North => {
-        println!("width::{} curosr::{}", self.width(), cursor);
         if self.width() <= cursor {
           Some(cursor - self.width())
         } else {
@@ -145,8 +144,8 @@ impl Grid {
     builder
   }
 
-  pub fn traverse(&self, traversal_order: TraversalOrder, start_corner: Corner) -> IterGrid {
-    return IterGrid::new(self.height(), self.width(), traversal_order, start_corner);
+  pub fn traverse(&self, traversal_order: &TraversalOrder, start_corner: &Corner) -> GridIter {
+    return GridIter::new(self.height(), self.width(), traversal_order, start_corner);
   }
 }
 
@@ -174,7 +173,7 @@ fn get_distinct_mut<T>(
   }
 }
 
-// Direction ------------------------------------------------------------------
+// Grid Enums ------------------------------------------------------------------
 
 #[derive(Debug)]
 pub enum Direction {
@@ -212,6 +211,33 @@ impl Direction {
   fn is_open(&self, cell: &u8) -> bool {
     self.value() & cell > 0
   }
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+pub enum Corner {
+  NorthWest,
+  NorthEast,
+  SouthWest,
+  SouthEast,
+}
+
+impl Corner {
+  pub fn to_directions(&self) -> (Direction, Direction) {
+    match self {
+      Corner::NorthWest => (Direction::North, Direction::West),
+      Corner::NorthEast => (Direction::North, Direction::East),
+      Corner::SouthWest => (Direction::South, Direction::West),
+      Corner::SouthEast => (Direction::South, Direction::East),
+    }
+  }
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+pub enum TraversalOrder {
+  RowWise = 1,
+  ColumnWise = 2,
 }
 
 // Status ---------------------------------------------------------------------

@@ -1,30 +1,18 @@
 use super::*;
 
-pub enum Corner {
-  NorthWest,
-  NorthEast,
-  SouthWest,
-  SouthEast,
-}
-
-pub enum TraversalOrder {
-  RowWise = 1,
-  ColumnWise = 2,
-}
-
-pub struct IterGrid {
+pub struct GridIter {
   pos: usize,
   max: usize,
   iterator: Box<dyn Fn(usize) -> usize>,
 }
 
-impl IterGrid {
+impl GridIter {
   pub fn new(
     height: usize,
     width: usize,
-    traversal_order: TraversalOrder,
-    start_corner: Corner,
-  ) -> IterGrid {
+    traversal_order: &TraversalOrder,
+    start_corner: &Corner,
+  ) -> GridIter {
     let (row_wise, col_wise) = match traversal_order {
       TraversalOrder::RowWise => (1, 0),
       TraversalOrder::ColumnWise => (0, 1),
@@ -57,7 +45,7 @@ impl IterGrid {
     let iterator = move |position: usize| {
       return col_fn(position) + row_fn(position) * width;
     };
-    return IterGrid {
+    return GridIter {
       pos: 0,
       iterator: Box::new(iterator),
       max: width * height,
@@ -69,7 +57,7 @@ impl IterGrid {
   }
 }
 
-impl Iterator for IterGrid {
+impl Iterator for GridIter {
   type Item = usize;
 
   fn next(&mut self) -> Option<Self::Item> {
