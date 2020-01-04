@@ -8,10 +8,7 @@ pub fn apply(grid: &mut Grid) -> Result<String, String> {
   let mut cursor = grid.random_cursor();
   visited.insert(cursor);
   while visited.len() < grid.area() {
-    let next_direction = grid.random_neighbor(cursor).expect("Nowhere to go!");
-    let next_cursor = grid
-      .find_valid_neighbor_idx(cursor, &next_direction)
-      .expect("Neighbor not found where expected.");
+    let (next_direction, next_cursor) = grid.random_neighbor(cursor).expect("Nowhere to go!");
 
     if visited.contains(&next_cursor) {
       // retreading ground

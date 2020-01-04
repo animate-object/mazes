@@ -102,11 +102,12 @@ impl Grid {
       .flatten()
   }
 
-  pub fn random_neighbor(&self, cursor: usize) -> Option<Direction> {
-    let mut open: Vec<Direction> = vec![];
+  pub fn random_neighbor(&self, cursor: usize) -> Option<(Direction, usize)> {
+    let mut open: Vec<(Direction, usize)> = vec![];
     for d in Direction::iterator() {
-      if self.find_valid_neighbor_idx(cursor, d).is_some() {
-        open.push(*d);
+      let neighbor_idx = self.find_valid_neighbor_idx(cursor, &d);
+      if neighbor_idx.is_some() {
+        open.push((*d, neighbor_idx.unwrap()));
       }
     }
     open
