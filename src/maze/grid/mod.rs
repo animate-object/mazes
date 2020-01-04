@@ -1,6 +1,12 @@
 use super::super::iter::*;
-use ::rand::{self, Rng};
+use ::rand::{
+  self,
+  distributions::{Distribution, Standard},
+  seq::SliceRandom,
+  Rng,
+};
 use ::std::convert::TryFrom;
+use std::slice::Iter;
 
 pub mod iter;
 
@@ -12,7 +18,6 @@ pub struct Dimensions {
 
 #[derive(Debug)]
 pub struct Grid {
-  unvisited: Vec<usize>,
   cells: Vec<u8>,
   dim: Dimensions,
 }
@@ -22,7 +27,6 @@ impl Grid {
     let maybe_area = usize::try_from(dim.width * dim.height);
     match maybe_area {
       Ok(area) => Ok(Grid {
-        unvisited: (0..(dim.width * dim.height)).collect(),
         cells: vec![0b00000000; area],
         dim,
       }),
@@ -57,7 +61,7 @@ impl Grid {
     rng.gen_range(0, self.area())
   }
 
-  fn find_valid_neighbor_idx<'cells>(&self, cursor: usize, dir: &Direction) -> Option<usize> {
+  pub fn find_valid_neighbor_idx<'cells>(&self, cursor: usize, dir: &Direction) -> Option<usize> {
     match dir {
       Direction::North => {
         if self.width() <= cursor {
@@ -68,7 +72,7 @@ impl Grid {
       }
       Direction::South => {
         let idx = cursor + self.width();
-        if idx <= self.area() {
+        if idx < self.area() {
           Some(idx)
         } else {
           None
@@ -88,7 +92,6 @@ impl Grid {
           None
         }
       }
-      _ => None,
     }
   }
 
@@ -99,6 +102,18 @@ impl Grid {
       .flatten()
   }
 
+  pub fn random_neighbor(&self, cursor: usize) -> Option<Direction> {
+    let mut open: Vec<Direction> = vec![];
+    for d in Direction::iterator() {
+      if self.find_valid_neighbor_idx(cursor, d).is_some() {
+        open.push(*d);
+      }
+    }
+    open
+      .choose(&mut rand::thread_rng())
+      .map(|val| val.to_owned())
+  }
+
   pub fn carve<'cells>(&mut self, cursor: usize, dir: &Direction) -> CarveResult {
     let maybe_neighbor_idx = self.find_valid_neighbor_idx(cursor, dir);
     match maybe_neighbor_idx {
@@ -107,7 +122,7 @@ impl Grid {
         match (maybe_cell, maybe_neighbor) {
           (Some(cell), Some(neighbor)) => {
             remove_wall(cell, neighbor, dir);
-            Ok("Carved new passage")
+            Ok(idx)
           }
           (Some(_), None) => Err(CarveError::missing_neighbor()),
           (None, Some(_)) => Err(CarveError::cursor_not_found()),
@@ -144,11 +159,7 @@ impl Grid {
     builder
   }
 
-  pub fn traverse(
-    &self,
-    traversal_order: &'static TraversalOrder,
-    start_corner: &'static Corner,
-  ) -> GridIter {
+  pub fn traverse(&self, traversal_order: &TraversalOrder, start_corner: &Corner) -> GridIter {
     return GridIter::new(self.height(), self.width(), traversal_order, start_corner);
   }
 }
@@ -179,25 +190,31 @@ fn get_distinct_mut<T>(
 
 // Grid Enums ------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Direction {
   North = 0b00001000,
   South = 0b00000100,
   East = 0b00000010,
   West = 0b00000001,
-  Up = 0b00010000,
-  Down = 0b00100000,
 }
 
 impl Direction {
+  fn iterator() -> Iter<'static, Direction> {
+    static DIRECTIONS: [Direction; 4] = [
+      Direction::North,
+      Direction::South,
+      Direction::East,
+      Direction::West,
+    ];
+    DIRECTIONS.into_iter()
+  }
+
   fn value(&self) -> u8 {
     match self {
       Direction::North => 0b00001000,
       Direction::South => 0b00000100,
       Direction::East => 0b00000010,
       Direction::West => 0b00000001,
-      Direction::Up => 0b00010000,
-      Direction::Down => 0b00100000,
     }
   }
 
@@ -207,13 +224,22 @@ impl Direction {
       Direction::East => Direction::West,
       Direction::South => Direction::North,
       Direction::West => Direction::East,
-      Direction::Up => Direction::Down,
-      Direction::Down => Direction::Up,
     }
   }
 
   fn is_open(&self, cell: &u8) -> bool {
     self.value() & cell > 0
+  }
+}
+
+impl Distribution<Direction> for Standard {
+  fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Direction {
+    match rng.gen_range(0, 4) {
+      0 => Direction::North,
+      1 => Direction::East,
+      2 => Direction::South,
+      _ => Direction::West,
+    }
   }
 }
 
@@ -282,4 +308,4 @@ impl CarveError {
   }
 }
 
-type CarveResult = Result<&'static str, CarveError>;
+type CarveResult = Result<usize, CarveError>;

@@ -11,7 +11,7 @@ impl GridIter {
     height: usize,
     width: usize,
     traversal_order: &TraversalOrder,
-    start_corner: &'static Corner,
+    start_corner: &Corner,
   ) -> GridIter {
     let (row_wise, col_wise) = match traversal_order {
       TraversalOrder::RowWise => (1, 0),

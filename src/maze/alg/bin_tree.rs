@@ -18,7 +18,7 @@ pub fn apply(grid: &mut Grid, corner: &'static Corner) -> Result<String, String>
       }
       (true, false) => grid.carve(cursor, &d1),
       (false, true) => grid.carve(cursor, &d2),
-      (false, false) => Ok("Reached opposite corner"),
+      (false, false) => Ok(0),
     };
 
     if result.is_err() {
