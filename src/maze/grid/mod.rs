@@ -1,4 +1,3 @@
-use super::super::iter::*;
 use ::rand::{
   self,
   distributions::{Distribution, Standard},
@@ -10,7 +9,7 @@ use std::slice::Iter;
 
 pub mod iter;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Dimensions {
   pub width: usize,
   pub height: usize,
@@ -23,12 +22,12 @@ pub struct Grid {
 }
 
 impl Grid {
-  pub fn with_dim(dim: Dimensions) -> Result<Grid, &'static str> {
+  pub fn with_dim(dim: &Dimensions) -> Result<Grid, &'static str> {
     let maybe_area = usize::try_from(dim.width * dim.height);
     match maybe_area {
       Ok(area) => Ok(Grid {
         cells: vec![0b00000000; area],
-        dim,
+        dim: dim.clone(),
       }),
       Err(_) => Err("Error allocating Griderator."),
     }
@@ -40,7 +39,7 @@ impl Grid {
       width: len,
       height: len,
     };
-    Grid::with_dim(dim)
+    Grid::with_dim(&dim)
   }
 
   pub fn width(&self) -> usize {
@@ -160,8 +159,16 @@ impl Grid {
     builder
   }
 
-  pub fn traverse(&self, traversal_order: &TraversalOrder, start_corner: &Corner) -> GridIter {
-    return GridIter::new(self.height(), self.width(), traversal_order, start_corner);
+  pub fn to_bytes(&self) -> Vec<u8> {
+    self.cells.clone()
+  }
+
+  pub fn traverse(
+    &self,
+    traversal_order: &TraversalOrder,
+    start_corner: &Corner,
+  ) -> iter::GridIter {
+    return iter::GridIter::new(self.height(), self.width(), traversal_order, start_corner);
   }
 }
 

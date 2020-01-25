@@ -1,7 +1,7 @@
 use super::super::grid::*;
 use rand::*;
 
-pub fn apply(grid: &mut Grid, corner: &'static Corner) -> Result<String, String> {
+pub fn apply(grid: &mut Grid, corner: &Corner) -> Result<String, String> {
   for cursor in grid.traverse(&TraversalOrder::RowWise, corner) {
     let (d1, d2) = corner.to_directions();
 
