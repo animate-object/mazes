@@ -95,10 +95,13 @@ impl Grid {
   }
 
   pub fn look(&self, cursor: usize, dir: &Direction) -> Option<&u8> {
-    self
+    match self
       .find_valid_neighbor_idx(cursor, dir)
       .map(|idx| self.cells.get(idx))
-      .flatten()
+    {
+      None => None,
+      Some(maybe_idx) => maybe_idx,
+    }
   }
 
   pub fn random_neighbor(&self, cursor: usize) -> Option<(Direction, usize)> {
