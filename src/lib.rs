@@ -43,9 +43,9 @@ pub enum Output {
 }
 
 pub struct Args {
-    output_type: OutputType,
-    dimensions: Dimensions,
-    algorigthm: Algorithm,
+    pub output_type: OutputType,
+    pub dimensions: Dimensions,
+    pub algorigthm: Algorithm,
 }
 
 pub fn generate(args: Args) -> Result<Output, String> {
